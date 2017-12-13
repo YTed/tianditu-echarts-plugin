@@ -32,4 +32,3 @@ var option = {
 * Initialize echarts with the option defined above, with `T.EChartsOverlay.initializeECharts`
 * Done.
 
-An example is provided as `map.html` and `map.js`.
