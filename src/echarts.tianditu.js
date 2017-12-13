@@ -44,7 +44,7 @@
 
 		TMapCoordSys.prototype.getViewRect = function() {
 			var api = this._api;
-			return new echarts.graphics.BoundingRect(0, 0, api.getWidth(), api.getHeight());
+			return new echarts.graphic.BoundingRect(0, 0, api.getWidth(), api.getHeight());
 		};
 
 		TMapCoordSys.prototype.getRoamTransform = function() {
