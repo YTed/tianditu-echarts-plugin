@@ -32,6 +32,7 @@ T.EChartsOverlay = T.Overlay.extend({
 	},
 	
 	onRemove: function(map) {
+		this._echarts.dispose();
 		map.getPanes().overlayPane.removeChild(this._div);
 		map.off("moveend", this._handleMoveEnd, this);
 	},
@@ -67,6 +68,7 @@ T.EChartsOverlay = T.Overlay.extend({
 	},
 	
 	_handleMoveEnd: function() {
+		this._div.style.display = 'none';
         var currentBounds = this._map.getBounds();
         if (!this.isadd && currentBounds.equals(this.bounds)) {
             this.isadd = false;
@@ -81,13 +83,15 @@ T.EChartsOverlay = T.Overlay.extend({
             h = sw.y - ne.y,
             w = ne.x - sw.x;
 
-
         this._div.style.width = w + 'px';
         this._div.style.height = h + 'px';
         this._div.style[this.CSS_TRANSFORM()] = 'translate(' + Math.round(leftX) + 'px,' + Math.round(topY) + 'px)';
-		
-		
 		this.draw();
+		
+		var div = this._div;
+		setTimeout(function() {
+			div.style.display = 'block';
+		}, 50);
 	},
 
     CSS_TRANSFORM: function () {
