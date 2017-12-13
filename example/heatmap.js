@@ -1,14 +1,16 @@
 $(function() {
 
+	var viewport = [];
 	var points = [].concat.apply([], data.map(function (track) {
 		return track.map(function (seg) {
+			viewport.push(new T.LngLat(seg.coord[0], seg.coord[1]));
 			return seg.coord.concat([1]);
 		});
 	}));
 	
 	
 	var map = new T.Map('mapDiv');
-	map.centerAndZoom(new T.LngLat(116.40969, 39.89945), 13);
+	map.setViewport(viewport);
 	
 	var config = {};
 	var overlay = new T.EChartsOverlay(config);
@@ -17,8 +19,6 @@ $(function() {
 		animation: false,
 		tianditu: {
 			overlayIndex: overlay.getIndex(),
-			center: [120.13066322374, 30.240018034923],
-			zoom: 14,
 		},
 		visualMap: {
 			show: false,
