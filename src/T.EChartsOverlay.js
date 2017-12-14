@@ -22,6 +22,7 @@ T.EChartsOverlay = T.Overlay.extend({
 		
 		map.getPanes().overlayPane.appendChild(elem);
 		map.on("moveend", this._handleMoveEnd, this);
+		map.on("resize", this._handleResize, this);
 		this._div = elem;
 		
 		this._echarts = echarts.init(elem);
@@ -29,12 +30,15 @@ T.EChartsOverlay = T.Overlay.extend({
 		this._index = __TMapOverlayWithEChart.count;
 		__TMapOverlayWithEChart.count++;
 		__TMapOverlayWithEChart[this._index] = this;
+		
+		this._handleMoveEnd();
 	},
 	
 	onRemove: function(map) {
 		this._echarts.dispose();
 		map.getPanes().overlayPane.removeChild(this._div);
 		map.off("moveend", this._handleMoveEnd, this);
+		map.off("resize", this._handleResize, this);
 	},
 	
 	getElement: function() {
@@ -92,6 +96,12 @@ T.EChartsOverlay = T.Overlay.extend({
 		setTimeout(function() {
 			div.style.display = 'block';
 		}, 50);
+	},
+	
+	_handleResize: function(event) {
+		var size = event.newSize;
+		this._div.style.width = size.x + "px";
+		this._div.style.height = size.y + "px";
 	},
 
     CSS_TRANSFORM: function () {

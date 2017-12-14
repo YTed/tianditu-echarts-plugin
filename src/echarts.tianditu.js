@@ -1,3 +1,9 @@
+/****************************************************************
+** Author: yude
+** Email: ted.yude@gmail.com
+****************************************************************/
+
+
 (function() {
 	
 	var TMapCoordinateSystem = function() {
@@ -114,6 +120,10 @@
 				if(center && zoom) {
 					var lnglat = new T.LngLat(center[0], center[1]);
 					map.centerAndZoom(lnglat, zoom);
+				} else {
+					center = map.getCenter();
+					center = [center.getLng(), center.getLat()];
+					zoom = map.getZoom();
 				}
 				
 				tmapCoordSys = new TMapCoordSys(map, api);
