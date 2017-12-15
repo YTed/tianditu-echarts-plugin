@@ -13,16 +13,16 @@ extension and [Tianditu's HeatMapOverlay](http://lbs.tianditu.com/api/js4.0/open
 var option = {
   // ...
   tianditu: {
-    overlayIndex: overlay.getIndex(),	// IMPORTANT !!
-    center: [113.6253, 34.7466],		// optional
-    zoom: 5,							// optional
+    overlayIndex: overlay.getIndex(),  // IMPORTANT !!
+    center: [113.6253, 34.7466],       // optional
+    zoom: 5,                           // optional
   },
   series: [
     {
       name: 'your series name',
       type: 'your series type',
-      coordinateSystem: 'tianditu',		// IMPORTANT if you want to display spatial data on map.
-      data: [], // your series data
+      coordinateSystem: 'tianditu',    // IMPORTANT if you want to display spatial data on map.
+      data: [],                        // your series data
     },
     // ...
   ]
