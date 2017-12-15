@@ -68,6 +68,14 @@ T.EChartsOverlay = T.Overlay.extend({
 		this.draw();
 	},
 	
+	addEChartsEventListener: function(event, handler) {
+		this._echarts.on(event, handler);
+	},
+	
+	removeEChartsEventListener: function(event, handler) {
+		this._echarts.off(event, handler);
+	},
+	
 	setOptions: function(options) {
 	},
 	
