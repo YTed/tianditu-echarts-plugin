@@ -2,7 +2,183 @@
 ** Author: yude
 ** Email: ted.yude@gmail.com
 ****************************************************************/
+T.__TMapOverlayWithEChart = { count: 0 };
 
+T.EChartsOverlay = T.Overlay.extend({
+	/**
+	 * option:
+	 *   - center, T.LngLat, default null
+	 *   - size, T.Point, default null
+	 *   - anchor, T.Point, default null
+	 *	 - followMap, boolean, default true
+	 *	 - cls, String, default null
+	 */
+	initialize: function(options) {
+		this.options = options;
+		this._div = null;
+		this._index = 0;
+	},
+	
+	onAdd: function(map) {
+		map.setViewport(this.options.viewport);
+		
+		this._map = map;
+		
+		var root = document.createElement("div");
+		root.style.position = "absolute";
+		
+		var left = 0, top = 0;
+		if(this.options.center) {
+			var px = map.lngLatToContainerPoint(this.options.center);
+			left = px.x;
+			top = px.y;
+		}
+		if(this.options.anchor) {
+			left += this.options.anchor.x;
+			top += this.options.anchor.y;
+		}
+		
+		if(this.options.cls) {
+			root.classList.add(this.options.cls);
+		}
+		
+		root.style.top = top + "px";
+		root.style.left = left + "px";
+		
+		this._setSize(root, map.getSize().x, map.getSize().y);
+			
+		map.getPanes().overlayPane.appendChild(root);
+		
+		if(this.options.followMap) {
+			map.on("moveend", this._handleMoveEnd, this);
+		}
+		map.on("resize", this._handleResize, this);
+		this._root = root;
+		
+		var elem = document.createElement("div");
+		root.appendChild(elem);
+		elem.style.width = '100%';
+		elem.style.height = '100%';
+		this._div = elem;
+		
+		this._echarts = echarts.init(elem);
+		
+		this._index = T.__TMapOverlayWithEChart.count;
+		T.__TMapOverlayWithEChart.count++;
+		T.__TMapOverlayWithEChart[this._index] = this;
+		
+		this._handleMoveEnd();
+	},
+	
+	onRemove: function(map) {
+		this._echarts.dispose();
+		map.getPanes().overlayPane.removeChild(this._root);
+		if(this.options.followMap) {
+			map.off("moveend", this._handleMoveEnd, this);
+		}
+		map.off("resize", this._handleResize, this);
+	},
+	
+	getElement: function() {
+		return this._root;
+	},
+	
+	getMap: function() {
+		return this._map;
+	},
+	
+	draw: function() {
+		if(this._chartView) {
+			this._chartView.update();
+		}
+	},
+	
+	setChartView: function(setChartView) {
+		this._chartView = setChartView;
+	},
+	
+	getIndex: function() {
+		return this._index;
+	},
+	
+	initializeECharts: function(echartsOption) {
+		this._echarts.setOption(echartsOption);
+		this.draw();
+	},
+	
+	addEChartsEventListener: function(event, handler) {
+		this._echarts.on(event, handler);
+	},
+	
+	removeEChartsEventListener: function(event, handler) {
+		this._echarts.off(event, handler);
+	},
+	
+	setOptions: function(options) {
+	},
+	
+	_handleMoveEnd: function() {
+		this._root.style.display = 'none';
+	
+		var currentBounds = this._map.getBounds();
+		if (!this.isadd && currentBounds.equals(this.bounds)) {
+			this.isadd = false;
+			return;
+		}
+		this.bounds = currentBounds;
+
+		var ne = this._map.lngLatToLayerPoint(currentBounds.getNorthEast()),
+			sw = this._map.lngLatToLayerPoint(currentBounds.getSouthWest()),
+			topY = ne.y,
+			leftX = sw.x,
+			h = sw.y - ne.y,
+			w = ne.x - sw.x;
+
+		this._setSize(this._root, w, h);
+		this._root.style[this.CSS_TRANSFORM()] = 'translate(' + Math.round(leftX) + 'px,' + Math.round(topY) + 'px)';
+
+		
+		this.draw();
+		var div = this._root;
+		setTimeout(function() {
+			div.style.display = 'block';
+		}, 50);
+	},
+	
+	_handleResize: function(event) {
+		var size = event.newSize;
+		this._setSize(this._root, size.x, size.y);
+	},
+	
+	_setSize: function(elem, w, h) {
+		if(this.options.size) {
+			elem.style.width = this.options.size.x + "px";
+			elem.style.height = this.options.size.y + "px";
+		} else {
+			elem.style.width = w + "px";
+			elem.style.height = h + "px";
+		}
+	},
+
+    CSS_TRANSFORM: function () {
+        var div = document.createElement('div');
+        var props = [
+            'transform',
+            'WebkitTransform',
+            'MozTransform',
+            'OTransform',
+            'msTransform'
+        ];
+
+        for (var i = 0; i < props.length; i++) {
+            var prop = props[i];
+            if (div.style[prop] !== undefined) {
+                return prop;
+            }
+        }
+        return props[0];
+    },
+});
 
 (function() {
 	
@@ -155,7 +331,7 @@
 			},
 			
 			getTOverlay: function() {
-				return __TMapOverlayWithEChart[this.option.overlayIndex];
+				return T.__TMapOverlayWithEChart[this.option.overlayIndex];
 			},
 		};
 	};
