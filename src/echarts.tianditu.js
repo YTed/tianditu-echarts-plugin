@@ -49,7 +49,9 @@ T.EChartsOverlay = T.Overlay.extend({
 			
 		map.getPanes().overlayPane.appendChild(root);
 		
-		if(this.options.followMap) {
+		if(this.options.followMap === true) {
+			map.on("move", this._handleMove, this);
+		} else {
 			map.on("moveend", this._handleMoveEnd, this);
 		}
 		map.on("resize", this._handleResize, this);
@@ -73,8 +75,10 @@ T.EChartsOverlay = T.Overlay.extend({
 	onRemove: function(map) {
 		this._echarts.dispose();
 		map.getPanes().overlayPane.removeChild(this._root);
-		if(this.options.followMap) {
-			map.off("moveend", this._handleMoveEnd, this);
+		if(this.options.followMap === true) {
+			map.off("move", this._handleMove, this);
+		} else {
+			map.off("moveend", this._handleMoveEnd, this);	
 		}
 		map.off("resize", this._handleResize, this);
 	},
@@ -102,6 +106,7 @@ T.EChartsOverlay = T.Overlay.extend({
 	},
 	
 	initializeECharts: function(echartsOption) {
+		this._echarts.clear();
 		this._echarts.setOption(echartsOption);
 		this.draw();
 	},
@@ -115,6 +120,25 @@ T.EChartsOverlay = T.Overlay.extend({
 	},
 	
 	setOptions: function(options) {
+	},
+	
+	_handleMove: function() {
+		var currentBounds = this._map.getBounds();
+		if (!this.isadd && currentBounds.equals(this.bounds)) {
+			this.isadd = false;
+			return;
+		}
+		this.bounds = currentBounds;
+
+		var ne = this._map.lngLatToLayerPoint(currentBounds.getNorthEast()),
+			sw = this._map.lngLatToLayerPoint(currentBounds.getSouthWest()),
+			topY = ne.y,
+			leftX = sw.x,
+			h = sw.y - ne.y,
+			w = ne.x - sw.x;
+
+		this._setSize(this._root, w, h);
+		this._root.style[this.CSS_TRANSFORM()] = 'translate(' + Math.round(leftX) + 'px,' + Math.round(topY) + 'px)';
 	},
 	
 	_handleMoveEnd: function() {
