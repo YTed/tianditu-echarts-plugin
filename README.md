@@ -5,11 +5,15 @@ extension and [Tianditu's HeatMapOverlay](http://lbs.tianditu.com/api/js4.0/open
 
 # Usage
 
-* Simply import `T.EChartsOverlay.js` and `echarts.tianditu.js` in your html header;
+* Simply import `echarts.tianditu.js` in your html header;
 * Instantiate a `T.EChartsOverlay` and add it to your map with `T.Map.addOverLay`;
 * Define your echarts option, if your data are coordinate-related, set `coordinateSystem` as `'tianditu'`:
 * Add a section of `tianditu` to your option, **use `overlayIndex` field to connect the `EChartsOverlay` instantiated above**:
 ```
+var config = {};
+var overlay = T.EChartsOverlay(config);
+map.addOverlay(overlay);
+
 var option = {
   // ...
   tianditu: {
@@ -28,6 +32,8 @@ var option = {
   ]
   // ...
 }
+
+overlay.initializeECharts(option);
 ```
 * Initialize echarts with the option defined above, with `T.EChartsOverlay.initializeECharts`
 * Done.

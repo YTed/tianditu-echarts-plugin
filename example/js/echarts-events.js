@@ -10,7 +10,7 @@ $(function(){
 	overlay.initializeECharts(option);
 	overlay.addEChartsEventListener('click', function(params) {
 		console.log(params);
-	};);
+	});
 });
 
 function generateOption(overlay) {
